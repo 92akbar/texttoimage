@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prompt-to-Image Converter</title>
+  <style>
+    /* General Styles */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f9;
+      color: #333;
+    }
+
+    /* Header */
+    header {
+      background-color: #6200ee;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+
+    /* Main Content */
+    main {
+      padding: 20px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    /* Input Section */
+    #input-section {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    #prompt-input {
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    #generate-button {
+      padding: 10px 20px;
+      background-color: #6200ee;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    #generate-button:hover {
+      background-color: #3700b3;
+    }
+
+    /* Image Display */
+    #image-display {
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    #generated-image {
+      max-width: 100%;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Footer */
+    footer {
+      background-color: #333;
+      color: white;
+      text-align: center;
+      padding: 10px;
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Prompt-to-Image Converter</h1>
+  </header>
+
+  <main>
+    <section id="input-section">
+      <input type="text" id="prompt-input" placeholder="Enter your prompt here...">
+      <button id="generate-button">Generate Image</button>
+    </section>
+
+    <section id="image-display">
+      <img id="generated-image" src="" alt="Generated Image" style="display: none;">
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; 2023 Prompt-to-Image Converter. All rights reserved.</p>
+  </footer>
+
+  <script>
+    const API_TOKEN = "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"; // Replace with your Hugging Face token
+    const MODEL_NAME = "stabilityai/stable-diffusion-2"; // Replace with your model name
+
+    document.getElementById("generate-button").addEventListener("click", async () => {
+      const prompt = document.getElementById("prompt-input").value;
+      if (!prompt) {
+        alert("Please enter a prompt!");
+        return;
+      }
+
+      const response = await fetch(
+        `https://api-inference.huggingface.co/models/${MODEL_NAME}`,
+        {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${API_TOKEN}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ inputs: prompt }),
+        }
+      );
+
+      if (!response.ok) {
+        alert("Failed to generate image. Please try again.");
+        return;
+      }
+
+      const imageBlob = await response.blob();
+      const imageUrl = URL.createObjectURL(imageBlob);
+      const imageElement = document.getElementById("generated-image");
+      imageElement.src = imageUrl;
+      imageElement.style.display = "block";
+    });
+  </script>
+</body>
+</html>
